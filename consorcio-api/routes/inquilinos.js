@@ -2,11 +2,24 @@ const express = require('express');
 const router = express.Router();
 const Inquilino = require('../models/inquilino');
 const Consorcio = require('../models/consorcio'); // Necesario para actualizar el consorcio
+// Si estás utilizando middleware de autenticación, descoméntalo y asegúrate de que esté configurado
+// const auth = require('../middleware/auth'); 
 
-// Obtener todos los inquilinos (opcional, para una vista general)
+// Obtener todos los inquilinos, con filtrado opcional por consorcioId
 router.get('/', async (req, res) => {
     try {
-        const inquilinos = await Inquilino.find().populate('consorcio');
+        // Extrae el consorcioId de los parámetros de consulta (query string)
+        const { consorcioId } = req.query;
+
+        let query = {}; // Objeto de consulta inicial vacío
+
+        // Si se proporciona un consorcioId, agrégalo a la consulta para filtrar
+        if (consorcioId) {
+            query.consorcio = consorcioId; // Filtra por el ID del consorcio
+        }
+
+        // Busca inquilinos en la base de datos aplicando el filtro, y popula el consorcio si es necesario
+        const inquilinos = await Inquilino.find(query).populate('consorcio');
         res.json(inquilinos);
     } catch (err) {
         console.error(err.message);
@@ -15,6 +28,7 @@ router.get('/', async (req, res) => {
 });
 
 // Obtener un inquilino por ID (para la página de detalles/edición)
+// Si usas autenticación, deberías añadirla aquí también: router.get('/:id', auth, async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const inquilino = await Inquilino.findById(req.params.id).populate('consorcio');
@@ -32,6 +46,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Crear un nuevo inquilino
+// Si usas autenticación, deberías añadirla aquí también: router.post('/', auth, async (req, res) => {
 router.post('/', async (req, res) => {
     // Asegurarse de recibir el nuevo campo tipoUnidad
     const { nombre, email, telefono, unidad, tipoUnidad, consorcio } = req.body; 
@@ -65,6 +80,7 @@ router.post('/', async (req, res) => {
 });
 
 // Actualizar un inquilino por ID
+// Si usas autenticación, deberías añadirla aquí también: router.put('/:id', auth, async (req, res) => {
 router.put('/:id', async (req, res) => {
     const { nombre, email, telefono, unidad, tipoUnidad, consorcio } = req.body; 
     try {
@@ -119,38 +135,8 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// Eliminar un inquilino por ID
-router.delete('/:id', async (req, res) => {
-    try {
-        let inquilino = await Inquilino.findById(req.params.id);
-
-        if (!inquilino) {
-            return res.status(404).json({ msg: 'Inquilino no encontrado para eliminar' });
-        }
-
-        const consorcioId = inquilino.consorcio; 
-
-        await Inquilino.findByIdAndDelete(req.params.id);
-
-        // Eliminar el ID del inquilino del array de inquilinos de su consorcio
-        if (consorcioId) {
-            await Consorcio.findByIdAndUpdate(
-                consorcioId,
-                { $pull: { inquilinos: req.params.id } }, 
-                { new: true, useFindAndModify: false }
-            );
-        }
-
-        res.json({ msg: 'Inquilino eliminado con éxito' });
-    } catch (err) {
-        console.error(err.message);
-        if (err.kind === 'ObjectId') {
-            return res.status(400).json({ msg: 'ID de inquilino no válido para eliminación.' });
-        }
-        res.status(500).send('Error del servidor al eliminar inquilino.');
-    }
-});
-
+// Eliminar un inquilino por ID (asegúrate de que esta ruta no esté duplicada)
+// Si usas autenticación, deberías añadirla aquí también: router.delete('/:id', auth, async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         let inquilino = await Inquilino.findById(req.params.id);
@@ -182,6 +168,5 @@ router.delete('/:id', async (req, res) => {
         res.status(500).send('Error del servidor al eliminar inquilino.');
     }
 });
-
 
 module.exports = router;

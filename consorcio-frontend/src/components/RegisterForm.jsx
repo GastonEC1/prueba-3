@@ -4,8 +4,7 @@ import { Card, Form, Button, Alert, Container, Row, Col, Spinner } from 'react-b
 import { useNavigate } from 'react-router-dom';
 import { FaUserPlus, FaArrowLeft } from 'react-icons/fa'; // Importar iconos
 
-// ¡IMPORTANTE! VERIFICA ESTA URL. Debe ser la URL de tu backend en Codespaces, terminando en /api
-const API_BASE_URL = 'https://plhsk4j3-5000.brs.devtunnels.ms/api'; 
+const API_BASE_URL = 'https://refactored-xylophone-jv659gpjqq62jqr5-5000.app.github.dev/api'; 
 
 function RegisterForm() {
     const [nombre, setNombre] = useState('');
@@ -23,7 +22,8 @@ function RegisterForm() {
         setMessage(null);
         setLoading(true);
 
-        const token = localStorage.getItem('token'); // Necesitamos el token del admin logueado
+        // *** CAMBIO AQUÍ: Usar 'authToken' para ser consistente con otros componentes ***
+        const token = localStorage.getItem('authToken'); 
 
         if (!token) {
             setError('Debes iniciar sesión como administrador para registrar nuevos usuarios.');

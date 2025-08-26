@@ -24,7 +24,7 @@ import React, { useState, useEffect } from 'react';
     import 'bootstrap/dist/css/bootstrap.min.css';
     import './index.css';
 
-    const API_BASE_URL = 'https://plhsk4j3-5000.brs.devtunnels.ms';
+    const API_BASE_URL = 'https://refactored-xylophone-jv659gpjqq62jqr5-5000.app.github.dev';
 
     function AppContent() {
         const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -181,14 +181,14 @@ import React, { useState, useEffect } from 'react';
                                     }
                                 />
 
-                                <Route path="/" element={<ProtectedRoute roles={['admin', 'propietario']}><Consorcios API_BASE_URL={API_BASE_URL} /></ProtectedRoute>} />
-                                <Route path="/consorcios" element={<ProtectedRoute roles={['admin', 'propietario']}><Consorcios API_BASE_URL={API_BASE_URL} /></ProtectedRoute>} />
-                                <Route path="/consorcios/:id" element={<ProtectedRoute roles={['admin', 'propietario']}><ConsorcioDetail API_BASE_URL={API_BASE_URL} userRole={userRole} userName={userName} /></ProtectedRoute>} />
-                                <Route path="/add-consorcio" element={<ProtectedRoute roles={['admin']}><AddConsorcio API_BASE_URL={API_BASE_URL} /></ProtectedRoute>} />
-                                <Route path="/edit-consorcio/:id" element={<ProtectedRoute roles={['admin']}><EditConsorcio API_BASE_URL={API_BASE_URL} /></ProtectedRoute>} />
+                                <Route path="/" element={<ProtectedRoute roles={['admin', 'propietario','employee']}><Consorcios API_BASE_URL={API_BASE_URL} /></ProtectedRoute>} />
+                                <Route path="/consorcios" element={<ProtectedRoute roles={['admin', 'propietario','employee']}><Consorcios API_BASE_URL={API_BASE_URL} /></ProtectedRoute>} />
+                                <Route path="/consorcios/:id" element={<ProtectedRoute roles={['admin', 'propietario','employee']}><ConsorcioDetail API_BASE_URL={API_BASE_URL} userRole={userRole} userName={userName} /></ProtectedRoute>} />
+                                <Route path="/add-consorcio" element={<ProtectedRoute roles={['admin','employee']}><AddConsorcio API_BASE_URL={API_BASE_URL} /></ProtectedRoute>} />
+                                <Route path="/edit-consorcio/:id" element={<ProtectedRoute roles={['admin','employee']}><EditConsorcio API_BASE_URL={API_BASE_URL} /></ProtectedRoute>} />
 
                                 <Route path="/add-inquilino/:consorcioId" element={<ProtectedRoute roles={['admin', 'employee']}><AddInquilino API_BASE_URL={API_BASE_URL} /></ProtectedRoute>} />
-                                <Route path="/inquilinos/:id" element={<ProtectedRoute roles={['admin', 'employee', 'propietario']}><InquilinoDetail API_BASE_URL={API_BASE_URL} /></ProtectedRoute>} />
+                                <Route path="/inquilinos/:id" element={<ProtectedRoute roles={['admin', 'employee', 'propietario','employee']}><InquilinoDetail API_BASE_URL={API_BASE_URL} /></ProtectedRoute>} />
                                 <Route path="/edit-inquilino/:id" element={<ProtectedRoute roles={['admin', 'employee']}><EditInquilino API_BASE_URL={API_BASE_URL} /></ProtectedRoute>} />
 
                                 <Route path="/add-activo/:consorcioId" element={<ProtectedRoute roles={['admin', 'employee']}><AddActivo API_BASE_URL={API_BASE_URL} /></ProtectedRoute>} />
