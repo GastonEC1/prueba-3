@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Container, Card, Row, Col, ListGroup, Button, Alert, Spinner, Badge, Modal, Form } from 'react-bootstrap';
-import { FaArrowLeft, FaEdit, FaInfoCircle, FaSearch, FaPlus } from 'react-icons/fa'; // Asegúrate de que 'react-icons' esté instalado
+import { FaArrowLeft, FaEdit, FaInfoCircle, FaSearch, FaPlus } from 'react-icons/fa';
 
 function ConsorcioDetail({ API_BASE_URL, userRole }) {
     const { id } = useParams();
@@ -12,7 +12,7 @@ function ConsorcioDetail({ API_BASE_URL, userRole }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda de inquilinos
+    const [searchTerm, setSearchTerm] = useState('');
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -60,9 +60,6 @@ function ConsorcioDetail({ API_BASE_URL, userRole }) {
     }, [API_BASE_URL, id, navigate]);
 
     useEffect(() => {
-        // La clave de ubicación (location.key) cambia con cada navegación,
-        // lo que fuerza la recarga de los datos cuando se vuelve a esta página,
-        // asegurando que se muestre la información más reciente de la API.
         fetchConsorcioDetails();
     }, [fetchConsorcioDetails, location.key]);
 
@@ -131,12 +128,10 @@ function ConsorcioDetail({ API_BASE_URL, userRole }) {
         return 'secondary';
     };
 
-    // Función para manejar el cambio en el campo de búsqueda de inquilinos
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
     };
 
-    // Filtrar inquilinos basados en el término de búsqueda
     const filteredInquilinos = inquilinos.filter(inquilino => {
         const term = searchTerm.toLowerCase();
         return (
@@ -261,8 +256,14 @@ function ConsorcioDetail({ API_BASE_URL, userRole }) {
 
                 <Col md={4}>
                     <Card className="shadow-sm border-0 mb-4 h-auto">
-                        <Card.Header as="h3" className="bg-light text-dark d-flex justify-content-between align-items-center">
+                        <Card.Header as="h3" className="bg-light text-dark d-flex justify-content-between align-items-center p-3">
                             Activos
+                            {/* BOTÓN AGREGADO AQUÍ */}
+                            {(userRole === 'admin' || userRole === 'employee') && (
+                                <Link to={`/add-activo/${consorcio._id}`} className="btn btn-primary btn-sm ms-auto" title="Agregar nuevo activo">
+                                    <FaPlus className="me-2" /> Agregar Activo
+                                </Link>
+                            )}
                         </Card.Header>
                         <ListGroup variant="flush">
                             {activos.length === 0 ? (
