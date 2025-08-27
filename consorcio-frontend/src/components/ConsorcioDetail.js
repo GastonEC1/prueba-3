@@ -63,14 +63,6 @@ function ConsorcioDetail({ API_BASE_URL, userRole }) {
         fetchConsorcioDetails();
     }, [fetchConsorcioDetails, location.key]);
 
-    const handleDeleteClick = (item, type) => {
-        // En un escenario sin botones de eliminación, esta función no sería llamada.
-        // Se mantiene como un placeholder o si el Modal es usado de otra forma.
-        // setItemToDelete(item);
-        // setItemTypeToDelete(type);
-        // setShowDeleteModal(true);
-    };
-
     const confirmDelete = async () => {
         // De igual forma, esta función no se ejecutaría sin un botón de eliminación.
         // setShowDeleteModal(false);
@@ -194,8 +186,6 @@ function ConsorcioDetail({ API_BASE_URL, userRole }) {
                                     <ListGroup variant="flush">
                                         <ListGroup.Item><strong>Nombre:</strong> {consorcio.nombre}</ListGroup.Item>
                                         <ListGroup.Item><strong>Dirección:</strong> {consorcio.direccion}</ListGroup.Item>
-                                        <ListGroup.Item><strong>Código Postal:</strong> {consorcio.codigoPostal}</ListGroup.Item>
-                                        <ListGroup.Item><strong>Provincia:</strong> {consorcio.provincia}</ListGroup.Item>
                                         <ListGroup.Item><strong>Pisos:</strong> {consorcio.pisos}</ListGroup.Item>
                                         <ListGroup.Item><strong>Unidades:</strong> {consorcio.unidades}</ListGroup.Item>
                                     </ListGroup>

@@ -75,8 +75,7 @@ router.post('/send-maintenance-notification', async (req, res) => {
         const defaultEmailSubject = `Notificación de Mantenimiento - ${consorcio.nombre} - ${activo.nombre}`;
         const defaultEmailBody = `
             <p>Estimado/a Inquilino/a,</p>
-            <p>Le informamos que se ha realizado el mantenimiento del activo "<strong>${activo.nombre}</strong>" (Ubicación: ${activo.ubicacion}) en el consorcio "<strong>${consorcio.nombre}</strong>".</p>
-            ${activo.descripcion ? `<p>Descripción del activo: ${activo.descripcion}</p>` : ''}
+            <p>Le informamos que se ha realizado el mantenimiento del activo "<strong>${activo.nombre}</strong>" "<strong>${consorcio.nombre}</strong>".</p>
             <p>Fecha de Mantenimiento: <strong>${fechaFormateada}</strong></p>
             <p>Costo Asociado: <strong>${costoFormateado}</strong></p>
             <p>Este costo se incluirá en sus próximas expensas. Para más detalles, por favor, revise el historial de gastos.</p>

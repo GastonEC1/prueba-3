@@ -187,7 +187,7 @@ La Administración del Consorcio "${activo.consorcio.nombre}"
                         <strong>Marca:</strong> {activo.marca || 'N/A'}<br/>
                         <strong>Modelo:</strong> {activo.modelo || 'N/A'}<br/>
                         <strong>Ubicación:</strong> {activo.ubicacion || 'N/A'}<br/>
-                        <strong>Descripción:</strong> {activo.descripcion || 'N/A'}<br/>
+                        <strong>Descripción:</strong> <span style={{ whiteSpace: 'pre-wrap' }}>{activo.descripcion || 'N/A'}</span><br/>
                         <strong>Fecha de Instalación:</strong> {formatFecha(activo.fechaInstalacion)}<br/>
                         <strong>Próximo Mantenimiento:</strong> {formatFecha(activo.proximoMantenimiento)}<br/>
                         <strong>Frecuencia de Mantenimiento:</strong> {activo.frecuenciaMantenimiento || 'N/A'}<br/>
@@ -195,7 +195,7 @@ La Administración del Consorcio "${activo.consorcio.nombre}"
                         <hr/> 
                     </Card.Text>
                     <div className="mt-3">
-                        <Link to={`/edit-activo/${activo._id}`} className="btn btn-warning me-2">
+                        <Link to={`/edit-activo/${activo._id}`} className="btn btn-primary me-2">
                             <FaEdit /> Editar Activo
                         </Link>
                         <Button variant="danger" onClick={handleDeleteActivo} className="me-2">

@@ -1,29 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Container, Table, Alert, Button } from 'react-bootstrap';
+import { Container, Table, Alert, Button, Form, FormControl, Modal } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { FaTrash, FaEdit } from 'react-icons/fa'; 
+import { FaTrash, FaEdit, FaSearch } from 'react-icons/fa'; 
 
+// Este componente lista todos los consorcios, con funcionalidad de búsqueda y un modal de confirmación de eliminación.
 function Consorcios() {
     const [consorcios, setConsorcios] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [searchTerm, setSearchTerm] = useState(''); // Estado para el término de búsqueda
+    const [showDeleteModal, setShowDeleteModal] = useState(false); // Estado para controlar la visibilidad del modal de eliminación
+    const [consorcioToDeleteId, setConsorcioToDeleteId] = useState(null); // ID del consorcio a eliminar
 
-    // ¡VERIFICA ESTA URL! Debe ser la de tu puerto 5000 de Codespaces + /api/consorcios
-    const backendUrl = 'https://refactored-xylophone-jv659gpjqq62jqr5-5000.app.github.dev/api/consorcios'; // Asegúrate que esta URL sea correcta para tu entorno
+    // URL del backend
+    const backendUrl = 'https://refactored-xylophone-jv659gpjqq62jqr5-5000.app.github.dev/api/consorcios'; 
     const token = localStorage.getItem('token');
 
-    // Efecto para cargar los consorcios cuando el componente se monta
-    useEffect(() => {
+    // Función para cargar los consorcios desde la API
+    const fetchConsorcios = () => {
         axios.get(backendUrl, {
             headers: { 'x-auth-token': token }
         })
         .then(response => {
-            // Asegúrate de que la respuesta sea un array antes de establecer el estado
             if (Array.isArray(response.data)) {
                 setConsorcios(response.data);
             } else {
-                // Si la respuesta no es un array, inicializa con un array vacío
                 console.warn('La API de consorcios no devolvió un array:', response.data);
                 setConsorcios([]);
             }
@@ -34,27 +36,47 @@ function Consorcios() {
             setLoading(false);
             console.error('Error fetching consorcios:', error);
         });
-    }, [backendUrl, token]); // Las dependencias aseguran que se recargue si la URL o el token cambian
+    };
 
-    // Función para manejar la eliminación de un consorcio
-    const handleDelete = async (id) => {
-        // Confirmación antes de eliminar para evitar borrados accidentales
-        if (window.confirm('¿Estás seguro de que quieres eliminar este consorcio y toda su información asociada (inquilinos, activos)? Esta acción no se puede deshacer.')) {
-            try {
-                await axios.delete(`${backendUrl}/${id}`, {
-                    headers: { 'x-auth-token': token }
-                });
-                // Si la eliminación es exitosa en el backend, actualiza la lista en el frontend
-                setConsorcios(consorcios.filter(cons => cons._id !== id));
-                alert('Consorcio eliminado con éxito.'); // Usar alert solo para confirmaciones
-            } catch (err) {
-                setError('Error al eliminar el consorcio. Inténtalo de nuevo.');
-                console.error('Error deleting consorcio:', err.response ? err.response.data : err.message);
-            }
+    // Efecto para cargar los consorcios cuando el componente se monta
+    useEffect(() => {
+        fetchConsorcios();
+    }, []); // El array vacío asegura que se ejecute solo una vez al montar
+
+    // Abre el modal de confirmación de eliminación
+    const handleDelete = (id) => {
+        setConsorcioToDeleteId(id);
+        setShowDeleteModal(true);
+    };
+
+    // Cierra el modal de confirmación
+    const handleCloseDeleteModal = () => {
+        setShowDeleteModal(false);
+        setConsorcioToDeleteId(null);
+    };
+
+    // Confirma la eliminación después de que el usuario acepta en el modal
+    const handleConfirmDelete = async () => {
+        try {
+            await axios.delete(`${backendUrl}/${consorcioToDeleteId}`, {
+                headers: { 'x-auth-token': token }
+            });
+            // Si la eliminación es exitosa, se vuelve a cargar la lista completa
+            fetchConsorcios();
+            handleCloseDeleteModal(); // Cierra el modal
+        } catch (err) {
+            setError('Error al eliminar el consorcio. Inténtalo de nuevo.');
+            console.error('Error deleting consorcio:', err.response ? err.response.data : err.message);
+            handleCloseDeleteModal(); // Cierra el modal incluso si hay un error
         }
     };
 
-    // Muestra un indicador de carga mientras se obtienen los datos
+    // Filtra los consorcios basándose en el término de búsqueda
+    const filteredConsorcios = consorcios.filter(consorcio =>
+        consorcio.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        consorcio.direccion.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     if (loading) {
         return (
             <Container className="mt-5 text-center">
@@ -63,7 +85,6 @@ function Consorcios() {
         );
     }
 
-    // Muestra un mensaje de error si la carga falló
     if (error) {
         return (
             <Container className="mt-5">
@@ -72,17 +93,33 @@ function Consorcios() {
         );
     }
 
-    // Renderiza la lista de consorcios si no hay errores y ya cargaron
     return (
         <Container className="mt-5">
             <div className="d-flex justify-content-between align-items-center mb-3">
-                <h2>Lista de Consorcios ({consorcios.length})</h2>
-                {/* Botón para navegar al formulario de agregar consorcio */}
+                <h2>Lista de Consorcios ({filteredConsorcios.length})</h2>
                 <Link to="/add-consorcio">
                     <Button variant="primary">+ Agregar Consorcio</Button>
                 </Link>
             </div>
-            {consorcios.length > 0 ? (
+
+            {/* Formulario de búsqueda */}
+            <Form className="d-flex mb-4">
+                <div className="input-group">
+                    <FormControl
+                        type="search"
+                        placeholder="Buscar por nombre o dirección..."
+                        className="me-2"
+                        aria-label="Search"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <span className="input-group-text">
+                        <FaSearch />
+                    </span>
+                </div>
+            </Form>
+            
+            {filteredConsorcios.length > 0 ? (
                 <Table striped bordered hover responsive className="mt-3">
                     <thead>
                         <tr>
@@ -92,7 +129,7 @@ function Consorcios() {
                         </tr>
                     </thead>
                     <tbody>
-                        {consorcios.map(consorcio => (
+                        {filteredConsorcios.map(consorcio => (
                             <tr key={consorcio._id}>
                                 <td>
                                     <Link to={`/consorcios/${consorcio._id}`}>
@@ -118,9 +155,27 @@ function Consorcios() {
                 </Table>
             ) : (
                 <Alert variant="info" className="mt-3">
-                    No hay consorcios para mostrar. Crea uno nuevo para empezar.
+                    No se encontraron consorcios que coincidan con la búsqueda.
                 </Alert>
             )}
+            
+            {/* Modal de confirmación de eliminación */}
+            <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirmar Eliminación</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    ¿Estás seguro de que quieres eliminar este consorcio? Esta acción no se puede deshacer y borrará toda la información asociada (inquilinos, activos, etc.).
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseDeleteModal}>
+                        Cancelar
+                    </Button>
+                    <Button variant="danger" onClick={handleConfirmDelete}>
+                        Eliminar
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
 }
